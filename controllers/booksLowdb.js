@@ -1,13 +1,3 @@
-const mongoose = require('mongoose')
-const booksSchema = new mongoose.Schema({
-    id: { type: String, required: true },
-    title: { type: String, required: true },
-    author: { type: String, required: true },
-}, {
-    timestamps: true
-})
-module.exports = mongoose.model('books', booksSchema)
-
 const { nanoid } = require('nanoid')
 const idLength = 8
 

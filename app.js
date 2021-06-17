@@ -11,8 +11,12 @@ const routerV1 = require('./routes/v1')  // using json with lowdb
 // const routerV2 = require('./routes/v2')  // using mongodb with mongoose
 
 const app = express()
-const { Low, JSONFile } = require('lowdb')
-db = new Low(new JSONFile('./db.json'))
+if(process.env.NODE_ENV !== 'test') {
+    app.db = require('./controllers/db')
+    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+}
+// const { Low, JSONFile } = require('lowdb')
+// db = new Low(new JSONFile('./db.json'))
 
 app.use(cors())
 app.use(express.json())
@@ -38,8 +42,8 @@ console.log(swaggerDocs)
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs))
 app.use('/api/v1', routerV1)
 
-db.read().then(() => {
-    console.debug('State has been updated')
-    app.db = db
-})
+// db.read().then(() => {
+//     console.debug('State has been updated')
+//     app.db = db
+// })
 module.exports = app;

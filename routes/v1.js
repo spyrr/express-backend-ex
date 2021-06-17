@@ -130,7 +130,7 @@ const booksMap = [
      *       500:
      *         description: Some error happened
      */
-    {uri: '/books/:id', method: 'put', proc: books.edit},
+    {uri: '/books/:id', method: 'put', proc: books.update},
     /**
      * @swagger
      * /api/v1/books/{id}:
