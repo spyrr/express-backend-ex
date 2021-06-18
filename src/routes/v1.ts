@@ -1,15 +1,42 @@
-const express = require('express')
-const router = express.Router()
-const books = require('../controllers/books')
+import * as express from "express"
+import * as books from "../controllers/books"
+
+const router: express.Router = express.Router()
+
 const healthMap = [{
     uri: '/health',
     method: 'get',
-    callback: (req, res) => { res.send('OK') }
+    proc: (req: express.Request, res: express.Response) => { res.send('OK') }
 }]
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       required:
+ *         - title
+ *         - author
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The auto-generated id of the book
+ *         title:
+ *           type: string
+ *           description: The book title
+ *         author:
+ *           type: string
+ *           description: The book author
+ *       example:
+ *         id: d5fE_asz
+ *         title: The New Turing Omnibus
+ *         author: Alexander K. Dewdney
+ */
 const booksMap = [
     /**
      * @swagger
-     * /api/v2/books:
+     * /api/v1/books:
      *   get:
      *     summary: Returns the list of all the books
      *     tags: [Books]
@@ -23,10 +50,10 @@ const booksMap = [
      *               items:
      *                 $ref: '#/components/schemas/Book'
      */
-    {uri: '/books', method: 'get', callback: books.readAll},
+    {uri: '/books', method: 'get', proc: books.readAll},
     /**
      * @swagger
-     * /api/v2/books/{id}:
+     * /api/v1/books/{id}:
      *   get:
      *     summary: Get the book by id
      *     tags: [Books]
@@ -47,10 +74,10 @@ const booksMap = [
      *       404:
      *         description: The book was not found
      */
-    {uri: '/books/:id', method: 'get', callback: books.read},
+    {uri: '/books/:id', method: 'get', proc: books.read},
     /**
      * @swagger
-     * /api/v2/books:
+     * /api/v1/books:
      *   post:
      *     summary: Create a new book
      *     tags: [Books]
@@ -72,10 +99,10 @@ const booksMap = [
      *       500:
      *         dsecription: Some server Error
      */
-    {uri: '/books', method: 'post', callback: books.add},
+    {uri: '/books', method: 'post', proc: books.add},
     /**
      * @swagger
-     * /api/v2/books/{id}:
+     * /api/v1/books/{id}:
      *   put:
      *     summary: Get the book by id
      *     tags: [Books]
@@ -104,10 +131,10 @@ const booksMap = [
      *       500:
      *         description: Some error happened
      */
-    {uri: '/books/:id', method: 'put', callback: books.edit},
+    {uri: '/books/:id', method: 'put', proc: books.update},
     /**
      * @swagger
-     * /api/v2/books/{id}:
+     * /api/v1/books/{id}:
      *   delete:
      *     summary: Remove the book by id
      *     tags: [Books]
@@ -126,47 +153,23 @@ const booksMap = [
      *       500:
      *         description: Some error happened
      */
-    {uri: '/books/:id', method: 'delete', callback: books.remove},
+    {uri: '/books/:id', method: 'delete', proc: books.remove},
 ]
 
 const schemas = [
     healthMap,
-    /**
-     * @swagger
-     * components:
-     *   schemas:
-     *     Book:
-     *       type: object
-     *       required:
-     *         - title
-     *         - author
-     *       properties:
-     *         id:
-     *           type: string
-     *           description: The auto-generated id of the book
-     *         title:
-     *           type: string
-     *           description: The book title
-     *         author:
-     *           type: string
-     *           description: The book author
-     *       example:
-     *         id: d5fE_asz
-     *         title: The New Turing Omnibus
-     *         author: Alexander K. Dewdney
-     */
     booksMap,
 ]
 
-for (let map of schemas) {
-    map.map((m) => {
-        if (m.method === 'get') router.get(m.uri, m.callback)
-        else if(m.method === 'post') router.post(m.uri, m.callback)
-        else if(m.method === 'put') router.put(m.uri, m.callback)
-        else if(m.method === 'delete') router.delete(m.uri, m.callback)
+for (let schema of schemas) {
+    schema.map((m) => {
+        if (m.method === 'get') router.get(m.uri, m.proc)
+        else if(m.method === 'post') router.post(m.uri, m.proc)
+        else if(m.method === 'put') router.put(m.uri, m.proc)
+        else if(m.method === 'delete') router.delete(m.uri, m.proc)
         else console.log('ERROR')
     })
    
 }
 
-module.exports = router
+export = router
