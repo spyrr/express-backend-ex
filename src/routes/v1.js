@@ -160,8 +160,8 @@ const schemas = [
     booksMap,
 ]
 
-for (let map of schemas) {
-    map.map((m) => {
+for (let schema of schemas) {
+    schema.map((m) => {
         if (m.method === 'get') router.get(m.uri, m.proc)
         else if(m.method === 'post') router.post(m.uri, m.proc)
         else if(m.method === 'put') router.put(m.uri, m.proc)
