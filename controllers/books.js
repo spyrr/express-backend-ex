@@ -1,64 +1,57 @@
-const mongoose = require('mongoose')
 const { nanoid } = require('nanoid')
 const idLength = 8
 
-const booksSchema = new mongoose.Schema({
-    id: String,
-    title: String,
-    author: String
-}, {collection: 'books'})
-
-const BookModel = mongoose.model('book', booksSchema)
-
-exports.readAll = (req, res) => {
-    // Load data from db
-    BookModel.find().then(books => {res.send(books)})
-}
-
-exports.read = (req, res) => {
+exports.readAll = async (req, res) => {
     try {
-        BookModel.findOne({id: req.params.id}).then(book => {res.send(book)})
+        const books = await req.app.db.books.find()
+        res.send(books)
     } catch (error) {
-        return res.status(404).send(error)
+        console.error(error)
+        return res.status(500).send(error)
     }
 }
 
-exports.add = (req, res) => {
+exports.read = async (req, res) => {
     try {
-        const book = new BookModel({
+        const book = await req.app.db.books.findOne({id: req.params.id})
+        res.send(book)
+    } catch (error) {
+        console.error(error)
+        return res.status(500).send(error)
+    }
+}
+
+exports.add = async (req, res) => {
+    try {
+        const book = await req.app.db.books.create({
             ...req.body,
             id: nanoid(idLength)
         })
-        book.save()
         res.send(book)
     } catch (error) {
+        console.error(error)
         return res.status(500).send(error)
     }
 }
 
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
     try {
-        BookModel.findOne({id: req.params.id})
-            .then(book => {
-                id = book['id']
-                Object.assign(book, req.body)
-                book['id'] = id
-                book.save()
-                res.send(book)
-            })
-    } catch(error) {
-        console.log(error)
-        return res.status(500).send(error)
-    }
-}
-
-exports.remove = (req, res) => {
-    try {
-        BookModel.deleteOne({id: req.params.id})
-            .then(book => {
-                res.sendStatus(200)
-            })
+        delete req.body.id
+        const rv = await req.app.db.books.updateOne({id: req.params.id}, req.body)
+        const book = await req.app.db.books.findOne({id: req.params.id})
+        res.send(book)
     } catch (error) {
-        return res.status(404).send(error)
+        console.error(error)
+        res.status(500).send(error)
+    }
+}
+
+exports.remove = async (req, res) => {
+    try {
+        const rv = await req.app.db.books.deleteOne({id: req.params.id})
+        res.send('Removed')
+    } catch (error) {
+        console.error(error)
+        return res.status(500).send(error)
     }
 }

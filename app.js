@@ -1,29 +1,18 @@
 const express = require('express')
 const morgan = require('morgan')
 const cors = require('cors')
-// const { db } = require('./controllers/db')
 const csurf = require('csurf')
 
 const swaggerJsDoc = require('swagger-jsdoc')
 const swaggerUI = require('swagger-ui-express')
 
 const routerV1 = require('./routes/v1')  // using json with lowdb
-// const routerV2 = require('./routes/v2')  // using mongodb with mongoose
-
 const app = express()
-if(process.env.NODE_ENV !== 'test') {
-    app.db = require('./controllers/db')
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-}
-// const { Low, JSONFile } = require('lowdb')
-// db = new Low(new JSONFile('./db.json'))
 
 app.use(cors())
 app.use(express.json())
 app.use(morgan("dev"))
-// app.use(csurf())
 
-// const swaggerOptions = 
 const swaggerDocs = swaggerJsDoc({
     swaggerDefinition: {
         openapi: '3.0.0',
@@ -34,16 +23,18 @@ const swaggerDocs = swaggerJsDoc({
         },
         servers: [{url: 'http://localhost:18888'}],
     },
-    //apis: ['./routes/*.js', ]
     apis: ['./routes/v1.js', ]
 })
-console.log(swaggerDocs)
+console.info(swaggerDocs)
 
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs))
 app.use('/api/v1', routerV1)
 
-// db.read().then(() => {
-//     console.debug('State has been updated')
-//     app.db = db
-// })
+if(process.env.NODE_ENV !== 'test') {
+    const PORT = process.env.PORT || 18888
+    const { BookModel } = require('./controllers/db')
+    app.db = { books: BookModel }
+    app.listen(PORT, () => console.log(`listening on ${PORT}`))
+}
+
 module.exports = app;
