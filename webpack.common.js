@@ -3,15 +3,9 @@ const Dotenv = require("dotenv-webpack");
 
 module.exports = {
   entry: "./src/app.js",
-
+  target: 'node16',
   resolve: {
-    // alias: {
-    //   Components: path.resolve(__dirname, "./src/components/"),
-    // },
-    extensions: [".js", ".jsx"],
+    fallback: { util: false, }
   },
-
-  plugins: [
-    new Dotenv(),
-  ],
+  plugins: [ new Dotenv(), ],
 };
