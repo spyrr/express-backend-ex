@@ -1,0 +1,44 @@
+# Use root/example as user/password credentials
+# This file from https://hub.docker.com/_/mongo
+version: '3.1'
+services:
+  mongo:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 22222:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+    depends_on:
+      - mongo
+
+  vault:
+    image: vault
+    restart: always
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: abc123
+    cap_add:
+      - IPC_LOCK
+
+  backend:
+    image: node:16.3.0-alpine3.13
+    restart: always
+    volumes:
+      - /home/spyrr/dev/node/express-backend-ex:/app
+    ports:
+      - 18888:18888
+    depends_on:
+      - vault
+      - mongo
+    working_dir: /app/dist
+    entrypoint:
+      - node
+      - main.js
