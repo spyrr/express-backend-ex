@@ -29,12 +29,16 @@ services:
       - IPC_LOCK
 
   backend:
-    image: express-backend-ex:v1
+    image: node:16.3.0-alpine3.13
     restart: always
-    build:
-      context: .
+    volumes:
+      - /home/spyrr/dev/node/express-backend-ex:/app
     ports:
       - 18888:18888
     depends_on:
       - vault
       - mongo
+    working_dir: /app/dist
+    entrypoint:
+      - node
+      - main.js
